@@ -19,3 +19,7 @@ commands:
       - level
       - lvl
       - lvls
+permissions:
+  CyberLevels.player.multiplier:
+    description: "Set this in order for the player to actually get the multiplier"
+    default: false

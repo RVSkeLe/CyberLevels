@@ -55,6 +55,11 @@ config:
   # of the last exp gain/loss?
   stack-combo-exp: true
 
+  # In order for this to work you should also give the CyberLevels.player.multiplier permission
+  # then you can add the cyberlevels.player.multiplier.NUMBER permission
+  # if it's changed when a player is already logged in, it won't change
+  # in order to change it the player should quit and rejoin the server
+  # This was mainly done for performance improvement.
   multipliers:
     # Should multipliers apply to the following?
     commands: false

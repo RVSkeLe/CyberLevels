@@ -80,8 +80,8 @@ public class PlayerData {
         amount = Math.max(amount, 0);
 
         // does player have a multiplier permission?
-        if (doMultiplier && main.playerUtils().hasParentPerm(player, "CyberLevels.player.multiplier.", false))
-            amount *= main.playerUtils().getMultiplier(player);
+        if(doMultiplier)
+            amount *= main.levelCache().getMultiplierPlayer(player);
 
         final double totalAmount = amount;
 

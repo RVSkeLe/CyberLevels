@@ -12,6 +12,7 @@ public class PlayerUtils {
         this.main = main;
     }
 
+    // I'll leave this here for the moment
     public boolean hasParentPerm(Player player, String permission, boolean checkOp) {
         if (checkOp && player.isOp()) return true;
         for (PermissionAttachmentInfo permissionNode : player.getEffectivePermissions()) {
@@ -22,6 +23,7 @@ public class PlayerUtils {
     }
 
     public double getMultiplier(Player player) {
+        if(!player.hasPermission("CyberLevels.player.multiplier")) return 1;
         double multiplier = 0;
         for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
             if (!perm.getValue()) continue;

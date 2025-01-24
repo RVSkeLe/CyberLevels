@@ -29,6 +29,7 @@ public class LevelCache {
 
     private final Map<Player, PlayerData> playerLevels;
     private Map<Long, LevelData> levelData;
+    private Map<Player, Double> playerMultipliers;
     private Leaderboard leaderboard;
 
     private final boolean doCommandMultiplier;
@@ -67,6 +68,7 @@ public class LevelCache {
         messageConsole = config.getBoolean("config.messages.message-console", true);
 
         playerLevels = new HashMap<>();
+        playerMultipliers = new HashMap<>();
         clearLevelData();
         startAutoSave();
         if (config.getBoolean("config.mysql.enabled")) {
@@ -186,6 +188,7 @@ public class LevelCache {
         }
         else playerData = mySQL.getPlayerData(player);
         playerLevels.put(player, playerData);
+        playerMultipliers.put(player, main.playerUtils().getMultiplier(player));
     }
 
     public void savePlayer(Player player, boolean clearData) {
@@ -240,6 +243,8 @@ public class LevelCache {
     public Map<Long, LevelData> levelData() {
         return levelData;
     }
+
+    public Double getMultiplierPlayer(Player player) { return this.playerMultipliers.get(player); }
 
     public MySQL getMySQL() {
         return mySQL;
