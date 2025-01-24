@@ -206,7 +206,10 @@ public class LevelCache {
             }
         }
         else mySQL.updatePlayer(player);
-        if (clearData) playerLevels.remove(player);
+        if (clearData){
+            playerLevels.remove(player);
+            playerMultipliers.remove(player);
+        }
     }
 
     public void loadOnlinePlayers() {
