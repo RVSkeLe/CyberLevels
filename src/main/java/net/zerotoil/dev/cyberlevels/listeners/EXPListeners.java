@@ -130,12 +130,10 @@ public class EXPListeners implements Listener {
         }
         if (main.expCache().isOnlyNaturalBlocks() &&
                 event.getBlock().hasMetadata("CLV_PLACED")) {
-            if (version > 12 ? !(event.getBlock().getBlockData() instanceof Ageable)
-                    : !(event.getBlock().getState().getData() instanceof Ageable) ||
+            if (!(event.getBlock().getBlockData() instanceof Ageable) ||
                     main.expCache().isIncludeNaturalCrops()) return;
             else {
-                final Ageable ageable = (Ageable) (version > 12 ? event.getBlock().getBlockData()
-                        : event.getBlock().getState().getData());
+                final Ageable ageable = (Ageable) (event.getBlock().getBlockData());
                 if (ageable.getAge() != ageable.getMaximumAge()) return;
             }
         }
