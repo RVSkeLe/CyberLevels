@@ -113,12 +113,5 @@
             <artifactId>exp4j</artifactId>
             <version>0.4.8</version>
         </dependency>
-        <dependency>
-            <groupId>me.rivaldev.harvesterhoes</groupId>
-            <artifactId>RivalHarvesterHoesAPI</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/RivalHarvesterHoesAPI.jar</systemPath>
-        </dependency>
     </dependencies>
 </project>

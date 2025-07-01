@@ -7,7 +7,6 @@ import net.zerotoil.dev.cyberlevels.commands.CLVTabComplete;
 import net.zerotoil.dev.cyberlevels.listeners.AntiAbuseListeners;
 import net.zerotoil.dev.cyberlevels.listeners.EXPListeners;
 import net.zerotoil.dev.cyberlevels.listeners.JoinListener;
-import net.zerotoil.dev.cyberlevels.listeners.hooks.RivalHarvesterHoesHook;
 import net.zerotoil.dev.cyberlevels.objects.exp.EXPCache;
 import net.zerotoil.dev.cyberlevels.objects.levels.LevelCache;
 import net.zerotoil.dev.cyberlevels.objects.files.Files;
@@ -17,6 +16,7 @@ import net.zerotoil.dev.cyberlevels.utilities.Logger;
 import net.zerotoil.dev.cyberlevels.utilities.PlayerUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CyberLevels extends JavaPlugin {
@@ -38,8 +38,8 @@ public final class CyberLevels extends JavaPlugin {
         final long startTime = System.currentTimeMillis();
         logger = new Logger(this);
 
-        reloadClasses(false);
         playerUtils = new PlayerUtils(this);
+        reloadClasses(false);
         expListeners = new EXPListeners(this);
         new AntiAbuseListeners(this);
 
@@ -49,11 +49,6 @@ public final class CyberLevels extends JavaPlugin {
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
             new PlaceholderAPI(this).register();
-
-        if (Bukkit.getPluginManager().getPlugin("RivalHarvesterHoes") != null) {
-            logger("&7Hooked into &bRivalHarvesterHoes&7.");
-            new RivalHarvesterHoesHook(this);
-        }
 
         new Metrics(this, 13782, this);
         logger("&7Loaded &dCLV v" + getDescription().getVersion() + "&7 in &a" +
@@ -121,12 +116,26 @@ public final class CyberLevels extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        levelCache.saveOnlinePlayers(true);
-        levelCache.clearLevelData();
-        levelCache.cancelAutoSave();
-        // stuff
+        // Unregister all listeners registered by this plugin
+        org.bukkit.event.HandlerList.unregisterAll(this);
 
-        if (levelCache.getMySQL() != null) levelCache.getMySQL().disconnect();
+        // Cancel scheduled tasks
+        if (expCache != null) {
+            expCache.cancelTimedEXP();
+            expCache.cancelAntiAbuseTimers();
+        }
+        if (levelCache != null) {
+            levelCache.cancelAutoSave();
+
+            // Save player data and clear cache
+            levelCache.saveOnlinePlayers(true);
+            levelCache.clearLevelData();
+
+            // Close MySQL connection if exists
+            if (levelCache.getMySQL() != null) {
+                levelCache.getMySQL().disconnect();
+            }
+        }
     }
 
     public String getAuthors() {
@@ -143,7 +152,9 @@ public final class CyberLevels extends JavaPlugin {
     }
 
     public void logger(String... messages) {
-        logger.log(messages);
+        for (String message : messages) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+        }
     }
 
     public Files files() {
