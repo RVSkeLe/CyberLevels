@@ -24,7 +24,7 @@ public class PlayerUtils {
 
     public double getMultiplier(Player player) {
         if(!player.hasPermission("CyberLevels.player.multiplier")) return 1;
-        double multiplier = 0;
+        double multiplier = 1;
         for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
             if (!perm.getValue()) continue;
             String s = perm.getPermission().toLowerCase();
@@ -36,7 +36,6 @@ public class PlayerUtils {
                 // nothing
             }
         }
-        if (multiplier == 0) return 1;
         return multiplier;
     }
 
