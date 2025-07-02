@@ -4,6 +4,7 @@ import net.zerotoil.dev.cyberlevels.CyberLevels;
 import net.zerotoil.dev.cyberlevels.objects.exp.EXPEarnEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -105,40 +106,37 @@ public class EXPListeners implements Listener {
     private void onPlacing(BlockPlaceEvent event) {
         if (event.isCancelled()) return;
 
-        if (main.expCache().isOnlyNaturalBlocks())
+        if (main.expCache().isOnlyNaturalBlocks()) {
             event.getBlock().setMetadata("CLV_PLACED", new FixedMetadataValue(main, true));
+        }
 
         sendExp(event.getPlayer(), main.expCache().expEarnEvents().get("placing"), event.getBlock().getType().toString());
     }
 
-    // Works 1.7.10 - latest
-    @EventHandler (priority = EventPriority.HIGHEST)
+    // Works latest
+    @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onBreaking(BlockBreakEvent event) {
-        if (event.isCancelled()) return;
-
-        final int version = main.serverVersion();
+        Player player = event.getPlayer();
 
         // silk touch abuse
         if (main.expCache().isPreventSilkTouchAbuse()) {
-
-            if (version > 8 && event.getPlayer().getInventory()
-                    .getItemInMainHand().containsEnchantment(Enchantment.SILK_TOUCH)) return;
-
-            else if (version <= 8 && event.getPlayer().getItemInHand()
-                    .containsEnchantment(Enchantment.SILK_TOUCH)) return;
-
-        }
-        if (main.expCache().isOnlyNaturalBlocks() &&
-                event.getBlock().hasMetadata("CLV_PLACED")) {
-            if (!(event.getBlock().getBlockData() instanceof Ageable) ||
-                    main.expCache().isIncludeNaturalCrops()) return;
-            else {
-                final Ageable ageable = (Ageable) (event.getBlock().getBlockData());
-                if (ageable.getAge() != ageable.getMaximumAge()) return;
-            }
+            if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.SILK_TOUCH)) return;
         }
 
-        sendExp(event.getPlayer(), main.expCache().expEarnEvents().get("breaking"), event.getBlock().getType().toString());
+        Block block = event.getBlock();
+        boolean naturalBlock = main.expCache().isOnlyNaturalBlocks();
+        boolean clvMeta = block.hasMetadata("CLV_PLACED");
+
+        if (!naturalBlock || !clvMeta) return;
+
+        block.removeMetadata("CLV_PLACED", main);
+
+        if (!(block.getBlockData() instanceof Ageable) || main.expCache().isIncludeNaturalCrops()) return;
+
+        final Ageable ageable = (Ageable) (block.getBlockData());
+        if (ageable.getAge() != ageable.getMaximumAge()) return;
+
+        sendExp(event.getPlayer(), main.expCache().expEarnEvents().get("breaking"), block.getType().toString());
     }
 
     // Works 1.7.10 - latest
