@@ -113,30 +113,31 @@ public class EXPListeners implements Listener {
         sendExp(event.getPlayer(), main.expCache().expEarnEvents().get("placing"), event.getBlock().getType().toString());
     }
 
-    // Works latest
+    // Works on latest
     @EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onBreaking(BlockBreakEvent event) {
         Player player = event.getPlayer();
+        Block block = event.getBlock();
 
-        // silk touch abuse
+        // Prevent Silk Touch abuse
         if (main.expCache().isPreventSilkTouchAbuse()) {
-            if (player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.SILK_TOUCH)) return;
+            ItemStack heldItem = player.getInventory().getItemInMainHand();
+            if (heldItem.containsEnchantment(Enchantment.SILK_TOUCH)) return;
         }
 
-        Block block = event.getBlock();
-        boolean naturalBlock = main.expCache().isOnlyNaturalBlocks();
-        boolean clvMeta = block.hasMetadata("CLV_PLACED");
+        boolean placed = block.hasMetadata("CLV_PLACED");
+        boolean onlyNatural = main.expCache().isOnlyNaturalBlocks();
 
-        if (!naturalBlock || !clvMeta) return;
+        if (onlyNatural && placed) {
+            block.removeMetadata("CLV_PLACED", main);
 
-        block.removeMetadata("CLV_PLACED", main);
+            if (!(block.getBlockData() instanceof Ageable ageable)) return;
+            if (!main.expCache().isIncludeNaturalCrops()) return;
 
-        if (!(block.getBlockData() instanceof Ageable) || main.expCache().isIncludeNaturalCrops()) return;
+            if (ageable.getAge() != ageable.getMaximumAge()) return;
+        }
 
-        final Ageable ageable = (Ageable) (block.getBlockData());
-        if (ageable.getAge() != ageable.getMaximumAge()) return;
-
-        sendExp(event.getPlayer(), main.expCache().expEarnEvents().get("breaking"), block.getType().toString());
+        sendExp(player, main.expCache().expEarnEvents().get("breaking"), block.getType().toString());
     }
 
     // Works 1.7.10 - latest
