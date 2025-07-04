@@ -3,10 +3,13 @@ package net.zerotoil.dev.cyberlevels.objects;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.zerotoil.dev.cyberlevels.CyberLevels;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.Sound.Source;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -148,17 +151,13 @@ public class RewardObject {
     }
 
     private void playSound(Player player) {
-        Sound sound;
-        if (soundName.equals("")) return;
+        if (this.soundName == null || this.soundName.isEmpty()) return;
 
         try {
-            Enum.valueOf(Sound.class, soundName);
-            sound = Sound.valueOf(soundName);
+            Sound sound = Sound.sound(Key.key(this.soundName), Source.MASTER, volume, pitch);
+            player.playSound(sound);
+        } catch (IllegalArgumentException e) {
+            main.getLogger().warning("Invalid sound attempted: " + this.soundName + " for player " + player.getName());
         }
-        catch (Exception e) {
-            return;
-        }
-
-        player.playSound(player.getLocation(), sound, volume, pitch);
     }
 }
