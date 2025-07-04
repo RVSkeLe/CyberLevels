@@ -129,6 +129,7 @@ public class EXPListeners implements Listener {
         boolean onlyNatural = main.expCache().isOnlyNaturalBlocks();
 
         if (onlyNatural && placed) {
+//            Bukkit.getLogger().info("Placed by player");
             block.removeMetadata("CLV_PLACED", main);
 
             if (!(block.getBlockData() instanceof Ageable ageable)) return;
